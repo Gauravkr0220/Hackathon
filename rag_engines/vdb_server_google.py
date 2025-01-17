@@ -7,8 +7,8 @@ import json
 import logging
 from typing import Callable, Coroutine, List, Tuple
 from pathway.xpacks.llm.vector_store import VectorStoreServer
-from sentence_transformers import SentenceTransformer
 from utils.splitter import splitter_function
+from utils.embedder import embed_function
 
 import PyPDF2
 
@@ -46,8 +46,6 @@ table = pw.io.gdrive.read(
 
 # pw.io.jsonlines.write(table, "test.jsonl")
 
-embedder = SentenceTransformer("sentence-transformers/all-mini-l6-v2")
-embed_function = lambda text: embedder.encode([text])[0]
 vector_store = VectorStoreServer(
     table,
     parser=pdf_parser,
