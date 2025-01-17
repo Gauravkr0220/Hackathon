@@ -4,10 +4,10 @@ from langchain_core.output_parsers import StrOutputParser
 import pymupdf
 import time
 from math import ceil
-from evidence_checker_agent import EvidenceCheckerAgent
-from methodology_assessment import methodoloy_assessment_agent
-from content_evaluation_agent import content_eval_agent
-from argument_evaluation_agent import CoherenceAgent
+from pipeline.evidence_checker_agent import EvidenceCheckerAgent
+from pipeline.methodology_assessment import methodoloy_assessment_agent
+from pipeline.content_evaluation_agent import content_eval_agent
+from pipeline.argument_evaluation_agent import CoherenceAgent
 
 class aggregate_evaluation_agent:
     def __init__(self, model, api_key):

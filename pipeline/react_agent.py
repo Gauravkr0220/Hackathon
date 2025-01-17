@@ -7,7 +7,7 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
 
-from COA_agent import FusionRetrieval
+from pipeline.COA_agent import FusionRetrieval
 
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
 from llama_index.core.query_engine import RetrieverQueryEngine

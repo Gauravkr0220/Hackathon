@@ -8,23 +8,11 @@ import logging
 from typing import Callable, Coroutine, List, Tuple
 from pathway.xpacks.llm.vector_store import VectorStoreServer
 from sentence_transformers import SentenceTransformer
+from utils.splitter import splitter_function
 
 import PyPDF2
 
 logger = logging.getLogger(__name__)
-
-def splitter_function(text: str) -> list[tuple[str, dict]]:
-    """
-    Simple splitter that divides text into sentences.
-    
-    Args:
-        text (str): The input text to split.
-    
-    Returns:
-        list[tuple[str, dict]]: A list of tuples containing each sentence and an empty metadata dictionary.
-    """
-    sentences = text.split('. ')
-    return [(sentence.strip(), {}) for sentence in sentences if sentence]
 
 def pdf_parser(file_bytes: bytes) -> List[Tuple[str, dict]]:
     try:
@@ -40,9 +28,9 @@ def pdf_parser(file_bytes: bytes) -> List[Tuple[str, dict]]:
         #     "number_of_pages": len(reader.pages),
         # }
 
-        # append text to test.txt
-        with open("test.txt", "a") as f:
-            f.write(text)
+        # # append text to test.txt
+        # with open("test.txt", "a") as f:
+        #     f.write(text)
         
         return [("data", {"data": text})]
     except Exception as e:
@@ -56,7 +44,7 @@ table = pw.io.gdrive.read(
     with_metadata=True,
 )
 
-pw.io.jsonlines.write(table, "test.jsonl")
+# pw.io.jsonlines.write(table, "test.jsonl")
 
 embedder = SentenceTransformer("sentence-transformers/all-mini-l6-v2")
 embed_function = lambda text: embedder.encode([text])[0]
@@ -67,6 +55,4 @@ vector_store = VectorStoreServer(
     splitter=splitter_function,
 )
 vector_store.run_server(host="127.0.0.1", port=8000, threaded=True, with_cache=False)
-import time
-time.sleep(10)
 pw.run()

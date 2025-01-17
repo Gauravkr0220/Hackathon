@@ -1,7 +1,7 @@
 from pathway.xpacks.llm.vector_store import VectorStoreClient
 
 # Initialize the client
-client = VectorStoreClient(host="localhost", port=8000)
+client = VectorStoreClient(host="127.0.0.1", port=8000)
 
 # Define your query text
 query_text = "Sample query text"
