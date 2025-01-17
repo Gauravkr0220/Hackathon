@@ -47,7 +47,7 @@ class EvidenceCheckerAgent:
                 ("user", "This is the content to evaluate:\n\n{content}\n\nPlease verify the evidence supporting the claims and rate the quality of the paper out of 10 based on your review.""Give the whole response in 50 words\n\n"),
             ]
         )
-        self.evidence_checker = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
+        self.evidence_checker = self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
 
     def evaluate_coherence(self, content_chunks):
         evaluations = []

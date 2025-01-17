@@ -1,8 +1,8 @@
 from langchain_groq import ChatGroq
 import os
 from openai import OpenAI
-api_key=os.environ['OPENAI_API_KEY']
-client = OpenAI(api_key=api_key)
+# api_key=os.environ['OPENAI_API_KEY']
+# client = OpenAI(api_key=api_key)
 
 def llm_api(prompt, model, api_key):
     if "gpt" in model:
@@ -22,4 +22,4 @@ def llm_api(prompt, model, api_key):
             f.write("Prompt tokens: " + str(response.usage.prompt_tokens) + "\n")
             f.write("Completion tokens: " + str(response.usage.completion_tokens) + "\n")
         return response.choices[0].message.content
-    return ChatGroq(model=model, api_key=api_key)
+    return ChatGroq(model="llama3-70b-8192", api_key=api_key)

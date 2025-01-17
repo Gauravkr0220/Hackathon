@@ -33,7 +33,7 @@ class methodoloy_assessment_agent:
             ,
             ]
         )
-        self.content_agent=self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
+        self.content_agent=self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
 
     def evaluate_content(self, content: str) -> str:
         evaluations = []

@@ -41,7 +41,7 @@ class aggregate_evaluation_agent:
                 )
             ]
         )
-        self.aggregate_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
+        self.aggregate_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
         
     def aggregate_scores(self, content):
         content_evaluations = self.content_evaluation.evaluate_content(content)
@@ -73,7 +73,7 @@ class aggregate_evaluation_agent:
         return final_response
     
     
-def split_text(text, max_tokens=5000):
+def split_text(text, max_tokens=4000):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -90,7 +90,7 @@ def split_text(text, max_tokens=5000):
     return chunks
 
 
-def extract_and_chunk_paper(pdf_path, max_tokens=5000):
+def extract_and_chunk_paper(pdf_path, max_tokens=4000):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 
@@ -143,34 +143,14 @@ import os
 import json
 import concurrent.futures
 
-if __name__ == "__main__":
-    scores = {}
-    papers_dir = "./Papers-20250113T162420Z-001/Papers"
-    model = "llama3-70b-8192"
-    api_key = "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"
-    # print(os.listdir(papers_dir)[:10])
-
-    def process_paper(paper):
-        try:
-            pdf_path = os.path.join("./", paper)
-            headings_content = extract_and_chunk_paper(pdf_path)
-            aggregate_agent = aggregate_evaluation_agent(model, api_key)
-            final_response = aggregate_agent.aggregate_scores(headings_content)
-            return paper, final_response
-        except Exception as e:
-            print(f"Error processing paper {paper}: {e}")
-            return paper, None
-
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        futures = {executor.submit(process_paper, paper): paper for paper in os.listdir("./") if paper.endswith(".pdf")}
-        for future in concurrent.futures.as_completed(futures):
-            paper, result = future.result()
-            if result is not None:
-                scores[paper] = result
-
-    with open("scores_bad.json", "w") as f:
-        json.dump(scores, f)
- 
-    
-    
-        
+def process_paper(pdf_path):
+    try:
+        model = "llama3-70b-8192"
+        api_key = "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"
+        headings_content = extract_and_chunk_paper(pdf_path)
+        aggregate_agent = aggregate_evaluation_agent(model, api_key)
+        final_response = aggregate_agent.aggregate_scores(headings_content)
+        return final_response
+    except Exception as e:
+        print(f"Error processing paper : {e}")
+        return None

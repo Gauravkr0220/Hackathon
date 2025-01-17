@@ -52,7 +52,7 @@ class CoherenceAgent:
                 )
             ]
         )
-        self.coherence_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
+        self.coherence_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
 
     def evaluate_coherence(self, content_chunks):
         """
