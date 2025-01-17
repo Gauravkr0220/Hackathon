@@ -7,8 +7,8 @@ import json
 import logging
 from typing import Callable, Coroutine, List, Tuple
 from pathway.xpacks.llm.vector_store import VectorStoreServer
-from splitter import splitter_function
-from embedder import embed_function
+from utils.splitter import splitter_function
+from utils.embedder import embed_function
 
 import PyPDF2
 
