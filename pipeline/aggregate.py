@@ -4,10 +4,11 @@ from langchain_core.output_parsers import StrOutputParser
 import pymupdf
 import time
 from math import ceil
-from pipeline.evidence_checker_agent import EvidenceCheckerAgent
-from pipeline.methodology_assessment import methodoloy_assessment_agent
-from pipeline.content_evaluation_agent import content_eval_agent
-from pipeline.argument_evaluation_agent import CoherenceAgent
+from evidence_checker_agent import EvidenceCheckerAgent
+from methodology_assessment import methodoloy_assessment_agent
+from content_evaluation_agent import content_eval_agent
+from argument_evaluation_agent import CoherenceAgent
+from llm_api import llm_api
 
 class aggregate_evaluation_agent:
     def __init__(self, model, api_key):
@@ -40,7 +41,7 @@ class aggregate_evaluation_agent:
                 )
             ]
         )
-        self.aggregate_agent = self.eval_prompt | ChatGroq(model=model, api_key=api_key) | StrOutputParser()
+        self.aggregate_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
         
     def aggregate_scores(self, content):
         content_evaluations = self.content_evaluation.evaluate_content(content)
@@ -72,7 +73,7 @@ class aggregate_evaluation_agent:
         return final_response
     
     
-def split_text(text, max_tokens=5500):
+def split_text(text, max_tokens=5000):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -89,7 +90,7 @@ def split_text(text, max_tokens=5500):
     return chunks
 
 
-def extract_and_chunk_paper(pdf_path, max_tokens=3000):
+def extract_and_chunk_paper(pdf_path, max_tokens=5000):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 
@@ -138,22 +139,37 @@ def extract_and_chunk_paper(pdf_path, max_tokens=3000):
 
     return chunked_output
 
-
-
+import os
+import json
+import concurrent.futures
 
 if __name__ == "__main__":
-    pdf_path = "bad_paper_3.pdf"
-    headings_content = extract_and_chunk_paper(pdf_path)
-    # print(type(headings_content))
-    model="llama3-70b-8192"
-    api_key="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"
-    
-    aggregate_agent = aggregate_evaluation_agent(model, api_key)
-    final_response = aggregate_agent.aggregate_scores(headings_content)
-    with open("final_response.txt", "w") as f:
-        f.write(str(final_response))
-    print("final response saved to 'final_response.txt'")
+    scores = {}
+    papers_dir = "./Papers-20250113T162420Z-001/Papers"
+    model = "llama3-70b-8192"
+    api_key = "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"
+    # print(os.listdir(papers_dir)[:10])
 
+    def process_paper(paper):
+        try:
+            pdf_path = os.path.join("./", paper)
+            headings_content = extract_and_chunk_paper(pdf_path)
+            aggregate_agent = aggregate_evaluation_agent(model, api_key)
+            final_response = aggregate_agent.aggregate_scores(headings_content)
+            return paper, final_response
+        except Exception as e:
+            print(f"Error processing paper {paper}: {e}")
+            return paper, None
+
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        futures = {executor.submit(process_paper, paper): paper for paper in os.listdir("./") if paper.endswith(".pdf")}
+        for future in concurrent.futures.as_completed(futures):
+            paper, result = future.result()
+            if result is not None:
+                scores[paper] = result
+
+    with open("scores_bad.json", "w") as f:
+        json.dump(scores, f)
  
     
     

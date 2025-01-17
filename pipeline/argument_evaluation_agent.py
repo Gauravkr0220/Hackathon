@@ -2,6 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 import pymupdf
+from llm_api import llm_api
 
 class CoherenceAgent:
     """
@@ -12,7 +13,6 @@ class CoherenceAgent:
         api_key (str): The API key for accessing the model.
     """
     def __init__(self, model, api_key):
-        self.llm = ChatGroq(model=model, api_key=api_key)
         self.system_prompt = (
             "You are an expert in academic writing and research evaluation. Your task is to assess the logical coherence, "
             "clarity, and organization of arguments in research papers.\n\n"
@@ -37,7 +37,8 @@ class CoherenceAgent:
             "- Strengths: Highlight the well-written and logical aspects of the argument.\n"
             "- Issues: Identify specific problems in logical flow, clarity, or organization.\n"
             "- Suggestions: Provide detailed and actionable recommendations to address the issues.\n\n"
-            "- Overall Assessment: Give an overall rating out of 10 of the argument's coherence and effectiveness.\n\n"
+            "- Overall Assessment: Give an overall rating out of 10 of the argument's coherence and effectiveness.\n"
+            " Give the whole response in 50 words\n\n"
         )
         
         self.eval_prompt = ChatPromptTemplate.from_messages(
@@ -46,11 +47,12 @@ class CoherenceAgent:
                 (
                     "user", 
                     "This is the content of the research paper:\n\n {content}.\n\n"
-                    "Please evaluate it and rate the overall quality of the paper out of 10."
+                    "Please evaluate it and rate the overall quality of the paper out of 10\n."
+                    "Give the whole response in 50 words\n\n"
                 )
             ]
         )
-        self.coherence_agent = self.eval_prompt | self.llm | StrOutputParser()
+        self.coherence_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
 
     def evaluate_coherence(self, content_chunks):
         """
@@ -65,12 +67,12 @@ class CoherenceAgent:
         evaluations = []
         for i, chunk in enumerate(content_chunks):
             print(f"Evaluating chunk {i + 1}/{len(content_chunks)}...")
-            evaluation = self.coherence_agent.invoke({"content": chunk})
+            evaluation = self.coherence_agent.invoke({"content": chunk["content"]})
             evaluations.append(f"Evaluation for {chunk['heading']}:\n{evaluation}\n")
         return "\n".join(evaluations)
 
 
-def split_text(text, max_tokens=5500):
+def split_text(text, max_tokens=3000):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -87,7 +89,7 @@ def split_text(text, max_tokens=5500):
     return chunks
 
 
-def extract_and_chunk_paper(pdf_path, max_tokens=3500):
+def extract_and_chunk_paper(pdf_path, max_tokens=3000):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 
