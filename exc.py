@@ -23,7 +23,7 @@ def splitter_function(text: str) -> list[tuple[str, dict]]:
     Returns:
         list[tuple[str, dict]]: A list of tuples containing each sentence and an empty metadata dictionary.
     """
-    sentences = text.split('. ')
+    sentences = text.split(". ")
     return [(sentence.strip(), {}) for sentence in sentences if sentence]
 
 def pdf_parser(file_bytes: bytes) -> List[Tuple[str, dict]]:
@@ -41,10 +41,10 @@ def pdf_parser(file_bytes: bytes) -> List[Tuple[str, dict]]:
         # }
 
         # append text to test.txt
-        with open("test.txt", "a") as f:
-            f.write(text)
+        # with open("test.txt", "a") as f:
+        #     f.write(text)
         
-        return [("data", {"data": text})]
+        return [(text, {})]
     except Exception as e:
         logger.error(f"Error parsing PDF: {e}")
         return [("", {"error": str(e)})]
@@ -55,6 +55,12 @@ table = pw.io.gdrive.read(
     mode="streaming",
     with_metadata=True,
 )
+embedding = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
+def embed_function(text: str) -> list[float]:
+    return embedding.encode(text)
+        
+
 pw.io.jsonlines.write(table, "test.jsonl")
 vector_store = VectorStoreServer(
     table,

@@ -1,15 +1,14 @@
 from pathway.xpacks.llm.vector_store import VectorStoreClient
 
 # Initialize the client
-client = VectorStoreClient(host="localhost", port=8000)
+client = VectorStoreClient(host="127.0.0.1", port=8000)
 
 # Define your query text
-query_text = "Sample query text"
+query_text = "equations regarding Wasserstein distance"
 # Perform the query, retrieving the top 5 nearest neighbors
-results = client.query(query=query_text, k=5)
+results = client.query(query=query_text, k=1)
 
 # Print the results
-for idx, result in enumerate(results, start=1):
-    # print(f"Result {idx}: {result}")
-    with open("test.txt", "a") as f:
+with open("work.txt", "w") as f:
+    for idx, result in enumerate(results, start=1):
         f.write(f"Result {idx}: {result}\n")
