@@ -1,7 +1,11 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
+from llm_api import llm_api
 import pymupdf
+
+
+
 class methodoloy_assessment_agent:
     def __init__(self, model, api_key):
         self.llm=ChatGroq(model=model, api_key=api_key)
@@ -29,7 +33,7 @@ class methodoloy_assessment_agent:
             ,
             ]
         )
-        self.content_agent=self.eval_prompt | self.llm | StrOutputParser()
+        self.content_agent=self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
 
     def evaluate_content(self, content: str) -> str:
         evaluations = []

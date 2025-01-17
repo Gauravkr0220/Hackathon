@@ -1,6 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
+from llm_api import llm_api
 import pymupdf
 
 class EvidenceCheckerAgent:
@@ -37,35 +38,31 @@ class EvidenceCheckerAgent:
             "- Strengths: Summarize what is well-supported and credible.\n"
             "- Issues: Identify specific problems with credibility, sufficiency, or relevance of the evidence.\n"
             "- Suggestions: Provide detailed and actionable recommendations to address the identified issues.\n"
-            "- Overall Assessment: Provide an overall rating out of 10 on the quality of evidence supporting the claims."
+            "- Overall Assessment: Provide an overall rating out of 10 on the quality of evidence supporting the claims.\n"
+            " - Give the whole response in 50 words\n\n"
         )
         self.eval_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", self.system_prompt),
-                ("user", "This is the content to evaluate:\n\n{content}\n\nPlease verify the evidence supporting the claims and rate the quality of the paper out of 10 based on your review."),
+                ("user", "This is the content to evaluate:\n\n{content}\n\nPlease verify the evidence supporting the claims and rate the quality of the paper out of 10 based on your review.""Give the whole response in 50 words\n\n"),
             ]
         )
-        self.evidence_checker = self.eval_prompt | self.llm | StrOutputParser()
+        self.evidence_checker = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
 
     def evaluate_coherence(self, content_chunks):
-        """
-        Evaluates the coherence for each content chunk.
-
-        Args:
-            content_chunks (list): List of content chunks to evaluate.
-
-        Returns:
-            str: Combined evaluations of all content chunks.
-        """
         evaluations = []
         for i, chunk in enumerate(content_chunks):
-            print(f"Evaluating chunk {i + 1}/{len(content_chunks)}...")
-            evaluation = self.evidence_checker.invoke({"content": chunk})
+            token_count = len(chunk["content"].split())  # Rough estimate
+            if token_count > 5500:  # Ensure it is below the limit
+                print(f"Warning: Chunk {i + 1} has {token_count} tokens, reducing size.")
+            print(f"Evaluating chunk {i + 1}/{len(content_chunks)} with {token_count} tokens...")
+            evaluation = self.evidence_checker.invoke({"content": chunk["content"]})
             evaluations.append(f"Evaluation for {chunk['heading']}:\n{evaluation}\n")
         return "\n".join(evaluations)
 
 
-def split_text(text, max_tokens=5500):
+
+def split_text(text, max_tokens=3000):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -82,7 +79,7 @@ def split_text(text, max_tokens=5500):
     return chunks
 
 
-def extract_and_chunk_paper(pdf_path, max_tokens=3500):
+def extract_and_chunk_paper(pdf_path, max_tokens=3000):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 
@@ -133,7 +130,7 @@ def extract_and_chunk_paper(pdf_path, max_tokens=3500):
 
 
 if __name__ == "__main__":
-    pdf_path = "R004.pdf"
+    pdf_path = "bad_paper_3.pdf"
     content_chunks = extract_and_chunk_paper(pdf_path)
 
     
