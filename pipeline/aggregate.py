@@ -8,6 +8,7 @@ from evidence_checker_agent import EvidenceCheckerAgent
 from methodology_assessment import methodoloy_assessment_agent
 from content_evaluation_agent import content_eval_agent
 from argument_evaluation_agent import CoherenceAgent
+from introspective_agent import IntrospectiveAgent
 from utils.llm_api import llm_api
 
 class aggregate_evaluation_agent:
@@ -52,16 +53,7 @@ class aggregate_evaluation_agent:
         print("argument evaluations: ", argument_evaluations)
         evidence_checker_evaluations = self.evidence_checker.evaluate_coherence(content)   
         print("evidence checker evaluations: ", evidence_checker_evaluations) 
-        # final_response = []
-        # for i, chunk in enumerate(content):
-        #     print(f"Evaluating chunk {i + 1}/{len(content)}...")
-        #     evaluation = self.aggregate_agent.invoke({
-        #         "content_evaluation_response": content_evaluations[i],
-        #         "methodology_assessment_response": methodology_evaluations[i],
-        #         "argument_evaluation_response": argument_evaluations[i],
-        #         "evidence_checker_response": evidence_checker_evaluations[i]
-        #     })
-        #     final_response.append(evaluation) 
+        
              
         final_response = self.aggregate_agent.invoke({
             "content_evaluation_response": content_evaluations,
@@ -85,7 +77,7 @@ def split_text(text, max_tokens=7500):
         list: List of text chunks.
     """
     words = text.split()
-    chunk_size = max_tokens  # Approximation based on words
+    chunk_size = max_tokens  
     chunks = [" ".join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
     return chunks
 
@@ -114,7 +106,7 @@ def extract_and_chunk_paper(pdf_path, max_tokens=7500):
                     text = " ".join(span["text"] for span in line["spans"]).strip()
                     font_size = line["spans"][0]["size"]
 
-                    if font_size > 12:  # Treat larger font sizes as headings
+                    if font_size > 12:  
                         if current_heading and content_buffer:
                             headings_content[current_heading] = content_buffer.strip()
                         current_heading = text
@@ -127,7 +119,7 @@ def extract_and_chunk_paper(pdf_path, max_tokens=7500):
 
     doc.close()
 
-    # Chunk content under each heading
+    
     chunked_output = []
     for heading, content in headings_content.items():
         chunks = split_text(content, max_tokens=max_tokens)

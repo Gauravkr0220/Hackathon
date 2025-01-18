@@ -1,22 +1,24 @@
 import streamlit as st
 from conference_editor_agent import get_conference
 from aggregate import process_paper
+from COA_agent import CoAAgentWorker
+from react_agent import React_Agent
 from utils.score import get_score, get_final_conference, get_review
 
-# Function to evaluate a paper
+
 def evaluate_paper(pdf_path):
     evaluation_1 = process_paper(pdf_path)
     evaluation_2 = get_conference(pdf_path)
     return evaluation_1, evaluation_2
 
-# Streamlit app setup
+
 st.set_page_config(
     page_title="Research Paper Evaluation Tool",
     page_icon="📄",
     layout="wide"
 )
 
-# Title and description
+#
 st.title("📄 WELCOME TO CRISP.AI")
 st.write(
     """
@@ -25,7 +27,7 @@ st.write(
     """
 )
 
-# Sidebar for additional information
+
 with st.sidebar:
     st.header("About the Tool")
     st.write(
@@ -44,14 +46,14 @@ st.header("📤 Upload Your PDF")
 uploaded_file = st.file_uploader("Choose a PDF file", type=["pdf"])
 
 if uploaded_file:
-    # Save the uploaded file temporarily
+   
     pdf_path = "uploaded_file.pdf"
     with open(pdf_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     
     st.info("✅ File uploaded successfully! Processing...")
     
-    # Processing the file
+   
     try:
         evaluation_1, evaluation_2 = evaluate_paper(pdf_path)
         report = evaluation_1
@@ -59,7 +61,7 @@ if uploaded_file:
         score = get_score(evaluation_1)
         evaluation_1 = True if score > 6.5 else False
         
-        # Display the results
+        
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("Publishability Assessment")
