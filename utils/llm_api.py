@@ -1,8 +1,8 @@
 from langchain_groq import ChatGroq
 import os
 from openai import OpenAI
-# api_key=os.environ['OPENAI_API_KEY']
-# client = OpenAI(api_key=api_key)
+api_key=os.environ['OPENAI_API_KEY']
+client = OpenAI(api_key=api_key)
 
 def llm_api(prompt, model, api_key):
     if "gpt" in model:

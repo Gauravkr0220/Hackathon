@@ -3,7 +3,7 @@ from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 import pymupdf
 from pdfminer.high_level import extract_text
-from llm_api import llm_api
+from utils.llm_api import llm_api
 class content_eval_agent:
     def __init__(self, model, api_key):
         self.llm=ChatGroq(model=model, api_key=api_key)
@@ -34,7 +34,7 @@ class content_eval_agent:
             ,
             ]
         )
-        self.content_agent=self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
+        self.content_agent=self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
 
     def evaluate_content(self, content: str) -> str:
         evaluations = []

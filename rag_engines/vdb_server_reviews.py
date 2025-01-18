@@ -32,7 +32,7 @@ def parser(data: str) -> List[Tuple[str, dict]]:
         logger.error(f"Error parsing PDF: {e}")
         return [("", {"error": str(e)})]
 
-table = pw.io.fs.read("RAG_CONTENT/conferences/",
+table = pw.io.fs.read("RAG_CONTENT/review_papers/",
                     format="plaintext_by_file",
                     mode="static",
                     with_metadata=True,)
@@ -46,5 +46,5 @@ vector_store = VectorStoreServer(
     embedder=embed_function,
     splitter=splitter_function,
 )
-vector_store.run_server(host="127.0.0.1", port=8000, threaded=False)
+vector_store.run_server(host="127.0.0.1", port=8001, threaded=False)
 pw.run()

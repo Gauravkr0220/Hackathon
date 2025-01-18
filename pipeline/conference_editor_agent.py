@@ -4,10 +4,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 import pymupdf
-from llm_api import llm_api
+from utils.llm_api import llm_api
 class content_eval_agent:
     def __init__(self, model, api_key, content):
-        self.llm=(lambda prompt: llm_api(prompt, model="", api_key=api_key))
+        self.llm=(lambda prompt: llm_api(prompt, model="gpt", api_key=api_key))
         self.system_prompt= '''You are an expert in evaluating the relevance of research papers in conferences.
         In CVPR,conference mostly Computer vision and pattern recognition research related papers are submitted.
         In neurIPS,conference mostly machine learning, neuroscience, statistics, optimization, computer vision, natural language processing, life sciences, natural sciences, social science papers
@@ -223,7 +223,7 @@ from langchain_core.output_parsers import StrOutputParser
 import pymupdf
 class content_eval_agent_2:
     def __init__(self, model, api_key, content):
-        self.llm=(lambda prompt: llm_api(prompt, model="", api_key=api_key))
+        self.llm=(lambda prompt: llm_api(prompt, model="gpt", api_key=api_key))
         self.system_prompt= '''You are an intelligent paper evaluator designed to determine the most suitable journals or conferences for a research paper. Follow these steps to evaluate and recommend the best option:
 
 Step 1: Identify Top Journals/Conferences
@@ -399,7 +399,7 @@ Reason: The paper’s emphasis on spatio-temporal data and applications in socia
 
 from math import ceil
 
-def split_text(text, max_tokens=6000):
+def split_text(text, max_tokens=7500):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -415,7 +415,7 @@ def split_text(text, max_tokens=6000):
     chunks = [" ".join(words[i:i + chunk_size]) for i in range(0, len(words), chunk_size)]
     return chunks
 
-def extract_and_chunk_paper(pdf_path, max_tokens=2000):
+def extract_and_chunk_paper(pdf_path, max_tokens=7500):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 

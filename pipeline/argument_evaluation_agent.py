@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 import pymupdf
-from llm_api import llm_api
+from utils.llm_api import llm_api
 
 class CoherenceAgent:
     """
@@ -52,7 +52,7 @@ class CoherenceAgent:
                 )
             ]
         )
-        self.coherence_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
+        self.coherence_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
 
     def evaluate_coherence(self, content_chunks):
         """

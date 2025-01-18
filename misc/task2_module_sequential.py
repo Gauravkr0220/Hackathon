@@ -8,7 +8,7 @@ from llm_api import llm_api
 
 class content_eval_agent:
     def __init__(self, model, api_key):
-        self.llm=(lambda prompt: llm_api(prompt, model="", api_key=api_key))
+        self.llm=(lambda prompt: llm_api(prompt, model="gpt", api_key=api_key))
         self.system_prompt= '''You are an expert in evaluating the relevance of research papers in conferences.
         In CVPR,conference mostly Computer vision and pattern recognition research related papers are submitted.
         In neurIPS,conference mostly machine learning, neuroscience, statistics, optimization, computer vision, natural language processing, life sciences, natural sciences, social science papers
@@ -222,7 +222,7 @@ def extract_and_chunk_paper(pdf_path, max_tokens=2000):
 #2ndary agent*******************
 class content_eval_agent2:
     def __init__(self, model, api_key):
-        self.llm=(lambda prompt: llm_api(prompt, model="", api_key=api_key))
+        self.llm=(lambda prompt: llm_api(prompt, model="gpt", api_key=api_key))
         content = {}
         content["Neurips"] = """"""
         content["EMNLP"] = """"""

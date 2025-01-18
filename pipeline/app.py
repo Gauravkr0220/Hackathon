@@ -1,6 +1,7 @@
 import streamlit as st
 from conference_editor_agent import get_conference
 from aggregate import process_paper
+from utils.score import get_score, get_final_conference, get_review
 
 # Function to evaluate a paper
 def evaluate_paper(pdf_path):
@@ -54,20 +55,26 @@ if uploaded_file:
     try:
         evaluation_1, evaluation_2 = evaluate_paper(pdf_path)
         st.success("🎉 Evaluation completed!")
+        score = get_score(evaluation_1)
+        evaluation_1 = True if score > 6.5 else False
         
         # Display the results
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("Publishability Assessment")
             Result = "Publishable" if evaluation_1 else "Non-Publishable"
-            st.write(f"**Result:** {Result}")
+            st.write(f"**Result:** \n{Result}")
         
         with col2:
             st.subheader("Conference Recommendation")
             if (Result=="Non-Publishable"):
                 st.write(f"**Recommended Conference:** Not Applicable")
+                st.write(f"**Review:** {evaluation_1}")
             else:    
-                st.write(f"**Recommended Conference:** {evaluation_2}")
+                confernce = get_final_conference(evaluation_2)
+                review = get_review(evaluation_2)
+                st.write(f"**Recommended Conference:** {confernce}")
+                st.write(f"**Review:** {review}")
     except Exception as e:
         st.error(f"⚠️ An error occurred: {e}")
 

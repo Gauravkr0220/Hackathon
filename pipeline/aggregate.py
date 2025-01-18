@@ -8,7 +8,7 @@ from evidence_checker_agent import EvidenceCheckerAgent
 from methodology_assessment import methodoloy_assessment_agent
 from content_evaluation_agent import content_eval_agent
 from argument_evaluation_agent import CoherenceAgent
-from llm_api import llm_api
+from utils.llm_api import llm_api
 
 class aggregate_evaluation_agent:
     def __init__(self, model, api_key):
@@ -41,7 +41,7 @@ class aggregate_evaluation_agent:
                 )
             ]
         )
-        self.aggregate_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="", api_key=api_key)) | StrOutputParser()
+        self.aggregate_agent = self.eval_prompt | (lambda prompt: llm_api(prompt, model="gpt", api_key=api_key)) | StrOutputParser()
         
     def aggregate_scores(self, content):
         content_evaluations = self.content_evaluation.evaluate_content(content)
@@ -73,7 +73,7 @@ class aggregate_evaluation_agent:
         return final_response
     
     
-def split_text(text, max_tokens=4000):
+def split_text(text, max_tokens=7500):
     """
     Splits text into smaller chunks to meet token limit.
 
@@ -90,7 +90,7 @@ def split_text(text, max_tokens=4000):
     return chunks
 
 
-def extract_and_chunk_paper(pdf_path, max_tokens=4000):
+def extract_and_chunk_paper(pdf_path, max_tokens=7500):
     """
     Extracts headings and content from a PDF and ensures they fit within token limits.
 
