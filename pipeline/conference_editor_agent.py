@@ -494,7 +494,7 @@ def get_conference(pdf_path):
     output = evaluation + "\n"
     evaluation = evaluation.strip().split(". ")[-1]
     print("FIRST : ", evaluation)
-    content_evaluator = content_eval_agent_2(model, api_key, evaluation)
+    content_evaluator = content_eval_agent_2(model, api_key, evaluation.strip())
     evaluation_new = content_evaluator.evaluate_content(evaluation)
     print("SECOND : ", evaluation_new)
 
