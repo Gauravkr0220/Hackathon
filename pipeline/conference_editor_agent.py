@@ -498,7 +498,7 @@ def get_conference(pdf_path):
     evaluation_new = content_evaluator.evaluate_content(evaluation)
     print("SECOND : ", evaluation_new)
 
-    output += evaluation_new
+    output = evaluation_new
     return output
 
 
