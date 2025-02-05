@@ -1,1 +1,1 @@
-KDSH 2025 Hackathon
+Kharagpur DataScience Hackathon 2025 
